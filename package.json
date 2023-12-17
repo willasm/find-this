@@ -1,0 +1,140 @@
+{
+  "name": "find-this",
+  "displayName": "Find This",
+  "decription": "Search multiple search engines from within VSCode",
+  "version": "1.0.0",
+  "author": "William McKeever <willmck63@gmail.com>",
+  "publisher": "willasm",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.32.0"
+  },
+  "main": "src/extension.js",
+  "icon": "images/icon.png",
+  "keywords": [
+    "Bing",
+    "Github",
+    "Gist",
+    "Google",
+    "Stackoverflow",
+    "Youtube",
+    "web",
+    "search",
+    "websearch",
+    "find",
+    "help",
+    "launch",
+    "browser",
+    "query"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "find-this.searchForThis",
+        "title": "Find this..."
+      },
+      {
+        "command": "find-this.searchForThisInput",
+        "title": "Find this - Input text..."
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "find-this.searchForThis",
+        "key": "ctrl+f6",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "find-this.searchForThisInput",
+        "key": "ctrl+shift+f6",
+        "when": "editorTextFocus"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "find-this.searchForThis"
+        },
+        {
+          "command": "find-this.searchForThisInput"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "find-this.searchForThis",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Find This",
+      "type": "object",
+      "properties": {
+        "find-this.searchEngines":{
+          "type": "object",
+          "order": 0,
+          "default": {
+            "Bing": "https://www.bing.com/search?q=%SELECTION%",
+            "DuckDuckGo": "https://duckduckgo.com/?q=%SELECTION%",
+            "Github": "https://github.com/search?utf8=%E2%9C%93&q=%SELECTION%",
+            "Github Gist": "https://gist.github.com/search?utf8=%E2%9C%93&q=%SELECTION%",
+            "Google": "https://www.google.com/search?q=%SELECTION%",
+            "Stackoverflow": "https://stackoverflow.com/search?q=%SELECTION%",
+            "Youtube": "https://www.youtube.com/results?search_query=%SELECTION%"
+          },
+          "additionalProperties": {
+            "type": "string"
+          },
+          "markdownDescription": "Here you can define any additional search engines that you would like to use\n\n---\n\n*ITEM (key)* - Search engine name (displayed in the quickpick prompt)\n\n*VALUE (value)* - Search engine path including query string (`%SELECTION%` will be replaced with editors selected text or word under cursor)"
+        },
+        "find-this.searchEnginesDefaultToSelectedAtPrompt": {
+          "type": "array",
+          "order": 1,
+          "default": [
+            "Google"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "markdownDescription": "---\n\nThese search engines will be selected by default at the search prompt\n\nA new search tab will be opened for each search engine in this list (*the search engines to use can be toggled at the search prompt*)\n\nText must match **exactly** the name in the list of search engines above\n\nTip: In the list above, Double Click the name of the search engine then right click and select copy then add item here and paste the name"
+        },
+        "find-this.enableOnLanguageKeywords":{
+          "type": "boolean",
+          "order": 2,
+          "default": true,
+          "markdownDescription": "Default setting for sending additional keywords with the search query (*this can be toggled at the search prompt*)"
+        },
+        "find-this.onLanguageKeywordsList":{
+          "type": "object",
+          "order": 3,
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "markdownDescription": "These defined keywords will be added to your search query based on the language id of the current editors file\n\n\n\nFor example, a file with the language id of `bat` and defined keywords `Windows batch`, the query would by `Windows+batch+%SELECTION%`\n\n---\n\n*ITEM (key)* - Add These Keywords to Search query (Multiple words can be used when seperated by spaces)\n\n*VALUE (value)* - Visual Studio Code known language identifiers (See README.md for full list)"
+        },
+        "find-this.showSearchPrompt":{
+          "type": "boolean",
+          "order": 4,
+          "default": true,
+          "markdownDescription": "Disable to skip showing the search prompt - Will perform the search with current settings when disabled"
+        }
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/willasm/find-this.git"
+  },
+  "bugs": {
+    "url": "https://github.com/willasm/find-this/issues",
+    "email": "willmck63@gmail.com"
+  },
+  "homepage": "https://github.com/willasm/find-this#readme"
+}
