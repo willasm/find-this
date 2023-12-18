@@ -1,9 +1,12 @@
 {
   "name": "find-this",
   "displayName": "Find This",
-  "decription": "Search multiple search engines from within VSCode",
-  "version": "1.0.0",
-  "author": "William McKeever <willmck63@gmail.com>",
+  "description": "Search multiple search engines from within VSCode",
+  "version": "1.0.1",
+  "author": {
+    "name": "William McKeever",
+    "email": "willmck63@gmail.com"
+  },
   "publisher": "willasm",
   "license": "MIT",
   "engines": {
