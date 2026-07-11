@@ -1,8 +1,7 @@
-![](https://img.shields.io/visual-studio-marketplace/v/willasm.find-this)
-![](https://img.shields.io/visual-studio-marketplace/d/willasm.find-this)
-![](https://img.shields.io/visual-studio-marketplace/r/willasm.find-this)
-![](https://img.shields.io/visual-studio-marketplace/release-date/willasm.find-this)
-![](https://img.shields.io/visual-studio-marketplace/last-updated/willasm.find-this)
+![](https://vsmarketplacebadges.dev/version-short/willasm.find-this.png)
+![](https://vsmarketplacebadges.dev/installs-short/willasm.find-this.png)
+![](https://vsmarketplacebadges.dev/downloads/willasm.find-this.png)
+![](https://vsmarketplacebadges.dev/rating-star/willasm.find-this.png)
 
 # Find This
 A better way to search the web from Visual Studio Code.
@@ -14,16 +13,17 @@ A better way to search the web from Visual Studio Code.
   - Perform search on one or more search engine up to all seven included search engines if you wish
 - Include language specific keywords to add to search query
   - Eg. If current document is Main.js (Language ID `javascript`)
-  - and you have assigned the word `Javascript` to the list of keywords for the language ID `javascript`
+  - and you have assigned the words `js Javascript` to the list of keywords for the language ID `javascript`
   - the search query will resolve to `Javascript+%SELECTION%` (%SELECTION% will be replaced with text selection in the editor)
 - Search text does not need to be selected first
   - Will search the currently selected text
   - With no text selected it will search for the word at the current cursor position
   - If no word is found at the current cursor position it will search the contents of the current line
-- You can input your own search string, no need to use text from the current document
-- You can disable the search prompt in the extensions settings if you wish (Will perform the search with the default settings)
+- You can modify the search query before searching
+- You can input your own search query without using text from the current document
+- You can disable the search prompt in the extensions settings if you wish (Will perform the search with your default settings)
 - You can run the command `Search for this...` from the command palette or the right click context menu
-- You can run the command `Search for this - Input text...` from the command palette
+- You can run the command `Find this input text query...` from the command palette
 
 ## Screenshots
 Run from command palette...
@@ -46,7 +46,7 @@ Search result, Google...
 
 ![Search result Google](/images/SearchResultsGoogle.jpg)
 
-Search result, Stackoverflow...
+Search result, Stackoverflow... (Note: Stackoverflow will prompt with captcha)
 
 ![Search result Stackoverflow](/images/SearchResultsStackoverflow.jpg)
 
@@ -58,9 +58,19 @@ Settings 2...
 
 ![Settings 2](/images/Settings2.jpg)
 
+Settings 3...
+
+![Settings 3](/images/Settings3.jpg)
+
 ## Settings
-- `Search Engines` - You can add more search engines here if you wish
+- `Search Engines` - You can add or remove search engines here if you wish
 - `Search Engines Default To Selected At Prompt` - These search engines will by default be selected at the prompt
+  - `Google` is selected by default
+- `Enable Edit Search Query` - When enabled you will be prompted to edit the search query keywords before searching
+  - You will be prompted with an input box allowing you to edit the current search query
+  - Note: The entire current search query is selected so typing anything will replace it
+  - Just hit enter to use current search query without any change
+  - To only edit a portion of the query, mouse click in the input box or use an arrow movement key first, this will prevent removing the current search query
 - `Enable On Language Keywords` - When enabled the language ID associated keywords will be added to your search query
 - `On Language Keywords List` - This is where you can define your language ID associated keywords
 - `Show Search Prompt` - Shows the search engine pick list (When disabled the search will be performed with your default settings)
@@ -68,9 +78,9 @@ Settings 2...
 
 ## Commands
 The following commands are available from the command palette: (Windows: CTRL+Shift+P or F1) (Mac: CMD+Shift+P)
-- `Find this...` - Will perform a search on the selected text or the word at the current cursor position (Also available in the editors right click menu)
+- `Find this...` - Will perform a search on the selected text or the word at the current cursor position (Also available from the editors right click menu)
   - Default hotkey (ctrl+f6)
-- `Find this - Input text...` - Will perform a search on the text you enter into the input box
+- `Find this input text query...` - Will perform a search on the text you enter into the input box
   - Default hotkey (ctrl+shift+f6)
 
 ## Adding on language keywords
@@ -85,74 +95,84 @@ Once you have your new search engines query format you can add it in the setting
 
 Your final search path should look like this, `https://www.google.com/search?q=%SELECTION%`
 
-## Special Notes
-Visual Studio Code treats any `object` configuration setting in the `package.json` file as read only which means you can not edit the included search engines in the settings. If you attempt to edit them VSCode will just create a copy of the original. However this does not apply to any new entries that you add yourself. What this means is that if one of the search engines changes its search query format, an update to the extension will be required. If that does happen and you can not wait for an update, you could always just directly edit the `Package.json` file for this extension.
-
 ## The following table lists all Visual Studio Code known language identifiers
-If you have a language installed not in this list, Visual Studio Code actually displays the language on the statusbar. If you click on that you will get a complete list of all installed languages. For every language listed, to the right of it in parenthesis is the languages ID.
+If you have a language installed not in this list, Visual Studio Code actually displays the language on the statusbar. If you click on that you will get a complete list of all installed languages (includes language extensions you have installed). For every language listed, to the right of it in parenthesis is the languages ID. You can also view [the most up to date list here](https://code.visualstudio.com/docs/languages/identifiers) of supported languages built into Visual Studio Code.
 
-| Language            | Identifier                                                 |
-|---------------------|------------------------------------------------------------|
-| ABAP                | abap                                                       |
-| Windows Bat         | bat                                                        |
-| BibTeX              | bibtex                                                     |
-| Clojure             | clojure                                                    |
-| Coffeescript        | coffeescript                                               |
-| C                   | c                                                          |
-| C++                 | cpp                                                        |
-| C#                  | csharp                                                     |
-| Compose             | dockercompose                                              |
-| CSS                 | css                                                        |
-| CUDA C++            | cuda-cpp                                                   |
-| Diff                | diff                                                       |
-| Dockerfile          | dockerfile                                                 |
-| F#                  | fsharp                                                     |
-| Git                 | git-commit and git-rebase                                  |
-| Go                  | go                                                         |
-| Groovy              | groovy                                                     |
-| Handlebars          | handlebars                                                 |
-| Haml                | haml                                                       |
-| HTML                | html                                                       |
-| Ini                 | ini                                                        |
-| Java                | java                                                       |
-| JavaScript          | javascript                                                 |
-| JavaScript JSX      | javascriptreact                                            |
-| JSON                | json                                                       |
-| JSON with Comments  | jsonc                                                      |
-| Julia               | julia                                                      |
-| LaTeX               | latex                                                      |
-| Less                | less                                                       |
-| Lua                 | lua                                                        |
-| Makefile            | makefile                                                   |
-| Markdown            | markdown                                                   |
-| Objective-C         | objective-c                                                |
-| Objective-C++       | objective-cpp                                              |
-| Perl                | perl and perl6                                             |
-| PHP                 | php                                                        |
-| Plain Text          | plaintext                                                  |
-| PowerShell          | powershell                                                 |
-| Pug                 | jade, pug                                                  |
-| Python              | python                                                     |
-| R                   | r                                                          |
-| Razor (cshtml)      | razor                                                      |
-| Ruby                | ruby                                                       |
-| Rust                | rust                                                       |
-| SCSS                | scss (syntax using curly brackets), sass (indented syntax) |
-| ShaderLab           | shaderlab                                                  |
-| Shell Script (Bash) | shellscript                                                |
-| Slim                | slim                                                       |
-| SQL                 | sql                                                        |
-| Stylus              | stylus                                                     |
-| Swift               | swift                                                      |
-| TypeScript          | typescript                                                 |
-| TypeScript JSX      | typescriptreact                                            |
-| TeX                 | tex                                                        |
-| Visual Basic        | vb                                                         |
-| Vue                 | vue                                                        |
-| Vue HTML            | vue-html                                                   |
-| XML                 | xml                                                        |
-| XSL                 | xsl                                                        |
-| YAML                | yaml                                                       |
+| Language                | Identifier       |
+| ----------------------- | ---------------- |
+| Agent                   | chatagent        |
+| Batch                   | bat              |
+| BibTeX                  | bibtex           |
+| Binary                  | code-text-binary |
+| C                       | c                |
+| C#                      | csharp           |
+| C++                     | cpp              |
+| Clojure                 | clojure          |
+| Code Snippets           | snippets         |
+| CoffeeScript            | coffeescript     |
+| Compose                 | dockercompose    |
+| CSS                     | css              |
+| CUDA C++                | cuda-cpp         |
+| Dart                    | dart             |
+| Diff                    | diff             |
+| Docker                  | dockerfile       |
+| Dotenv                  | dotenv           |
+| F#                      | fsharp           |
+| Git Commit Message      | git-commit       |
+| Git Rebase Message      | git-rebase       |
+| Go                      | go               |
+| Groovy                  | groovy           |
+| Handlebars              | handlebars       |
+| HLSL                    | hlsl             |
+| HTML                    | html             |
+| Ignore                  | ignore           |
+| Ini                     | ini              |
+| Instructions            | instructions     |
+| Java                    | java             |
+| JavaScript              | javascript       |
+| JavaScript JSX          | javascriptreact  |
+| JSON                    | json             |
+| JSON Lines              | jsonl            |
+| JSON with Comments      | jsonc            |
+| Julia                   | julia            |
+| Julia Markdown          | juliamarkdown    |
+| LaTeX                   | latex            |
+| Less                    | less             |
+| Log                     | log              |
+| Lua                     | lua              |
+| Makefile                | makefile         |
+| Markdown                | markdown         |
+| MS SQL                  | sql              |
+| Objective-C             | objective-c      |
+| Objective-C++           | objective-cpp    |
+| Perl                    | perl             |
+| PHP                     | php              |
+| Plain Text              | plaintext        |
+| PowerShell              | powershell       |
+| Prompt                  | prompt           |
+| Properties              | properties       |
+| Pug                     | jade             |
+| Python                  | python           |
+| R                       | r                |
+| Raku                    | raku             |
+| Razor                   | razor            |
+| reStructuredText        | restructuredtext |
+| Ruby                    | ruby             |
+| Rust                    | rust             |
+| SCSS                    | scss             |
+| Search Result           | search-result    |
+| ShaderLab               | shaderlab        |
+| Shell Script            | shellscript      |
+| Skill                   | skill            |
+| Swift                   | swift            |
+| TeX                     | tex              |
+| TypeScript              | typescript       |
+| TypeScript JSX          | typescriptreact  |
+| Visual Basic            | vb               |
+| WebAssembly Text Format | wat              |
+| XML                     | xml              |
+| XSL                     | xsl              |
+| YAML                    | yaml             |
 
 ## Release Notes
 See the [Release Notes](RELEASE.md) for details.

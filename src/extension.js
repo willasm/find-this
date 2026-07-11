@@ -1,8 +1,8 @@
 const vscode = require("vscode");
 
 module.exports = {
-    activate,
-    deactivate,
+  activate,
+  deactivate,
 };
 
 let myContext;
@@ -12,17 +12,17 @@ let myContext;
 //  ╰──────────────────────────────────────────────────────────────────────────────╯
 async function activate(context) {
 
-    // Activate - Initialize Extension 
-    //---------------------------------------------------------------------------------------------------------
-    myContext = context;                    // Save context
+  // Activate - Initialize Extension
+  //---------------------------------------------------------------------------------------------------------
+  myContext = context;                    // Save context
 
-    // Activate - Register Extension Commands 
-    vscode.commands.registerCommand('find-this.searchForThis', searchForThis);
-    vscode.commands.registerCommand('find-this.searchForThisInput', searchForThisInput);
+  // Activate - Register Extension Commands
+  vscode.commands.registerCommand('find-this.searchForThis', searchForThis);
+  vscode.commands.registerCommand('find-this.searchForThisInput', searchForThisInput);
 
-    // Activate - Push Subscriptions 
-    context.subscriptions.push(searchForThis);
-    context.subscriptions.push(searchForThisInput);
+  // Activate - Push Subscriptions
+  context.subscriptions.push(searchForThis);
+  context.subscriptions.push(searchForThisInput);
 
 };
 
@@ -37,6 +37,7 @@ async function searchForThis() {
   let searchEngineNames = [];
   let searchEnginePaths = [];
   let searchEngineDefaults = [];
+  let enableEditSearchQuery = false;
   let enableOnLanguageKeywords = false;
   let showSearchPrompt = true;
   let onLanguageKeywords = [];
@@ -44,28 +45,31 @@ async function searchForThis() {
   let pickItems = [];
   let pickSearchEngines = [];
 
-  // searchForThis - Get Extensions Settings 
+  // searchForThis - Get Extensions Settings
   let settings = vscode.workspace.getConfiguration("find-this");
 
-  // searchForThis - Get search engines 
+  // searchForThis - Get search engines
   searchEngines = settings.get("searchEngines");
-  for ( var property in searchEngines ) {
+  for (var property in searchEngines) {
     searchEngineNames.push(property);
     searchEnginePaths.push(searchEngines[property]);
   }
 
-  // searchForThis - Get Search Engines Defaulted to Selected 
+  // searchForThis - Get Search Engines Defaulted to Selected
   searchEngineDefaults = settings.get("searchEnginesDefaultToSelectedAtPrompt");
 
-  // searchForThis - Get Enabled on Language ID Flag 
+  // searchForThis - Get Enabled Edit Search Query Flag
+  enableEditSearchQuery = settings.get("enableEditSearchQuery");
+
+  // searchForThis - Get Enabled on Language ID Flag
   enableOnLanguageKeywords = settings.get("enableOnLanguageKeywords");
 
-  // searchForThis - Get Show Search Prompt Flag 
+  // searchForThis - Get Show Search Prompt Flag
   showSearchPrompt = settings.get("showSearchPrompt");
 
-  // searchForThis - Get Language ID Keywords 
+  // searchForThis - Get Language ID Keywords
   onLanguage = settings.get("onLanguageKeywordsList");
-  for ( var property in onLanguage ) {
+  for (var property in onLanguage) {
     let keywordsList = property;
     let keywordsTrimSpaces = keywordsList.replace(/\s{2,}/g, ' ').trim();
     let keywordsItemAddPlus = keywordsTrimSpaces.replace(/\s/g, '+');
@@ -73,10 +77,10 @@ async function searchForThis() {
     onLanguageIDs.push(onLanguage[property]);
   };
 
-  // searchForThis - Get Selected Text or Word Under Cursor 
+  // searchForThis - Get Selected Text or Word Under Cursor
   let selectedText = getSelectedText();
 
-  // searchForThis - Define Quickpick 
+  // searchForThis - Define Quickpick
   let options = {
     placeHolder: 'Select the search engines you wish to use...',
     title: `---=== Find This ===---`,
@@ -84,45 +88,51 @@ async function searchForThis() {
   };
   let pick;
 
-  // searchForThis - Add Enable Language Keywords to Pick List 
+  // searchForThis - Edit search query before searching
+  if (enableEditSearchQuery) {
+    pickItems = [{ label: 'Edit search query before searching', picked: true }];
+  } else {
+    pickItems = [{ label: 'Edit search query before searching', picked: false }];
+  };
+
+  // searchForThis - Add Enable Language Keywords to Pick List
   if (onLanguageIDs.length > 0) {
     if (enableOnLanguageKeywords) {
-      pickItems = [{label: 'Enable language ID keywords', picked: true}];
+      pickItems.push({ label: 'Enable language ID keywords', picked: true });
     } else {
-      pickItems = [{label: 'Enable language ID keywords', picked: false}];
+      pickItems.push({ label: 'Enable language ID keywords', picked: false });
     };
   };
 
-  // searchForThis - Add Search Engines to Pick List 
+  // searchForThis - Add Search Engines to Pick List
   searchEngineNames.forEach(element => {
     if (searchEngineDefaults.includes(element)) {
-      pickItems.push({label: `${element}`, picked: true});
+      pickItems.push({ label: `${element}`, picked: true });
     } else {
-      pickItems.push({label: `${element}`, picked: false});
+      pickItems.push({ label: `${element}`, picked: false });
     };
   });
-  
-  // searchForThis - Skip the Quickpick if Set in Settings 
-  if (!showSearchPrompt) {
-    console.log('bbbb');
 
-    // searchForThis - Get Language ID and Apply Associated Keywords to Search Query 
+  // searchForThis - Skip the Quickpick if Set in Settings
+  if (!showSearchPrompt) {
+
+    // searchForThis - Get Language ID and Apply Associated Keywords to Search Query
     let editor = vscode.window.activeTextEditor;
     let langID = editor.document.languageId;
     if (enableOnLanguageKeywords) {
       if (onLanguageIDs.length > 0) {
         let langIndex = onLanguageIDs.indexOf(langID);
         if (langIndex != -1) {
-          let textNew = onLanguageKeywords[langIndex]+'+'+selectedText;
+          let textNew = onLanguageKeywords[langIndex] + '+' + selectedText;
           selectedText = textNew;
         }
       };
     };
 
-    // searchForThis - Get Default Search Engines 
+    // searchForThis - Get Default Search Engines
     let searchIndex = 0;
     let defaultsIndex = 0;
-    let loopIndex = searchEngineDefaults.length-1;
+    let loopIndex = searchEngineDefaults.length - 1;
     while (loopIndex <= searchEngineDefaults.length) {
       while (searchIndex < searchEngineNames.length) {
         if (searchEngineNames[searchIndex] == searchEngineDefaults[defaultsIndex]) {
@@ -131,11 +141,11 @@ async function searchForThis() {
         searchIndex++;
       };
       searchIndex = 0;
-      loopIndex ++;
-      defaultsIndex ++;
+      loopIndex++;
+      defaultsIndex++;
     };
 
-    // searchForThis - Perform Search Query 
+    // searchForThis - Perform Search Query
     let uriText = encodeURI(selectedText);
     let search;
     let query;
@@ -147,35 +157,51 @@ async function searchForThis() {
     return;
   };
 
-  // searchForThis - Show the Quickpick 
+  // searchForThis - Show the Quickpick
   pick = await vscode.window.showQuickPick(pickItems, options);
 
-  // searchForThis - User Canceled 
+  // searchForThis - User Canceled
   if (!pick || pick.length == 0) {
     return;
   };
 
-  // searchForThis - Get Language ID and Apply Associated Keywords to Search Query 
-  if (pick[0].label == 'Enable language ID keywords') {
+  // searchForThis - Get Language ID and Apply Associated Keywords to Search Query
+  if ((pick[0].label == 'Enable language ID keywords') || (pick[1].label == 'Enable language ID keywords')) {
     let editor = vscode.window.activeTextEditor;
     let langID = editor.document.languageId;
     if (enableOnLanguageKeywords) {
       if (onLanguageIDs.length > 0) {
         let langIndex = onLanguageIDs.indexOf(langID);
         if (langIndex != -1) {
-          let textNew = onLanguageKeywords[langIndex]+'+'+selectedText;
+          let textNew = onLanguageKeywords[langIndex] + '+' + selectedText;
           selectedText = textNew;
         }
       };
     };
   };
 
-  // searchForThis - Get Selected Search Engines 
+  // searchForThis - Edit Search Query Keywords
+  if (pick[0].label == 'Edit search query before searching') {
+    let optionsInput = {
+      value: selectedText,
+      title: `---=== Find This ===---`
+    };
+
+    // searchForThisInput - Show the Input Box
+    selectedText = await vscode.window.showInputBox(optionsInput);
+
+    // searchForThisInput - User Canceled or No Text Input
+    if (selectedText == undefined || selectedText == '') {
+      return;
+    };
+  };
+
+  // searchForThis - Get Selected Search Engines
   let pickIndex = 0;
   let searchIndex = 0;
-  let loopIndex = searchEngineNames.length-1;
+  let loopIndex = searchEngineNames.length - 1;
   if (pick[0].label == 'Enable language ID keywords') {
-    pickIndex++
+    pickIndex++;
   };
   while (pickIndex < pick.length) {
     while (searchIndex <= loopIndex) {
@@ -185,11 +211,11 @@ async function searchForThis() {
       searchIndex++;
     };
     searchIndex = 0;
-    loopIndex = searchEngineNames.length-1;
+    loopIndex = searchEngineNames.length - 1;
     pickIndex++;
   };
 
-  // searchForThis - Perform Search Query 
+  // searchForThis - Perform Search Query
   let uriText = encodeURI(selectedText);
   let search;
   let query;
@@ -219,28 +245,28 @@ async function searchForThisInput() {
   let pickItems = [];
   let pickSearchEngines = [];
 
-  // searchForThisInput - Get Extensions Settings 
+  // searchForThisInput - Get Extensions Settings
   let settings = vscode.workspace.getConfiguration("find-this");
 
-  // searchForThisInput - Get search engines 
+  // searchForThisInput - Get search engines
   searchEngines = settings.get("searchEngines");
-  for ( var property in searchEngines ) {
+  for (var property in searchEngines) {
     searchEngineNames.push(property);
     searchEnginePaths.push(searchEngines[property]);
   }
 
-  // searchForThisInput - Get Search Engines Defaulted to Selected 
+  // searchForThisInput - Get Search Engines Defaulted to Selected
   searchEngineDefaults = settings.get("searchEnginesDefaultToSelectedAtPrompt");
 
-  // searchForThisInput - Get Enabled on Language ID Flag 
+  // searchForThisInput - Get Enabled on Language ID Flag
   enableOnLanguageKeywords = settings.get("enableOnLanguageKeywords");
 
-  // searchForThisInput - Get Show Search Prompt Flag 
+  // searchForThisInput - Get Show Search Prompt Flag
   showSearchPrompt = settings.get("showSearchPrompt");
 
-  // searchForThisInput - Get Language ID Keywords 
+  // searchForThisInput - Get Language ID Keywords
   onLanguage = settings.get("onLanguageKeywordsList");
-  for ( var property in onLanguage ) {
+  for (var property in onLanguage) {
     let keywordsList = property;
     let keywordsTrimSpaces = keywordsList.replace(/\s{2,}/g, ' ').trim();
     let keywordsItemAddPlus = keywordsTrimSpaces.replace(/\s/g, '+');
@@ -248,21 +274,21 @@ async function searchForThisInput() {
     onLanguageIDs.push(onLanguage[property]);
   };
 
-  // searchForThisInput - Define Input 
+  // searchForThisInput - Define Input
   let optionsInput = {
     placeHolder: 'Enter your search query...',
     title: `---=== Find This ===---`
   };
 
-  // searchForThisInput - Show the Input Box 
+  // searchForThisInput - Show the Input Box
   selectedText = await vscode.window.showInputBox(optionsInput);
 
-  // searchForThisInput - User Canceled or No Text Input 
+  // searchForThisInput - User Canceled or No Text Input
   if (selectedText == undefined || selectedText == '') {
     return;
   };
 
-  // searchForThisInput - Define Quickpick 
+  // searchForThisInput - Define Quickpick
   let options = {
     placeHolder: 'Select the search engines you wish to use...',
     title: `---=== Find This ===---`,
@@ -270,44 +296,44 @@ async function searchForThisInput() {
   };
   let pick;
 
-  // searchForThisInput - Add Enable Language Keywords to Pick List 
+  // searchForThisInput - Add Enable Language Keywords to Pick List
   if (onLanguageIDs.length > 0) {
     if (enableOnLanguageKeywords) {
-      pickItems = [{label: 'Enable language ID keywords', picked: true}];
+      pickItems = [{ label: 'Enable language ID keywords', picked: true }];
     } else {
-      pickItems = [{label: 'Enable language ID keywords', picked: false}];
+      pickItems = [{ label: 'Enable language ID keywords', picked: false }];
     };
   };
 
-  // searchForThisInput - Add Search Engines to Pick List 
+  // searchForThisInput - Add Search Engines to Pick List
   searchEngineNames.forEach(element => {
     if (searchEngineDefaults.includes(element)) {
-      pickItems.push({label: `${element}`, picked: true});
+      pickItems.push({ label: `${element}`, picked: true });
     } else {
-      pickItems.push({label: `${element}`, picked: false});
+      pickItems.push({ label: `${element}`, picked: false });
     };
   });
 
-  // searchForThisInput - Skip the Quickpick if Set in Settings 
+  // searchForThisInput - Skip the Quickpick if Set in Settings
   if (!showSearchPrompt) {
 
-    // searchForThisInput - Get Language ID and Apply Associated Keywords to Search Query 
+    // searchForThisInput - Get Language ID and Apply Associated Keywords to Search Query
     let editor = vscode.window.activeTextEditor;
     let langID = editor.document.languageId;
     if (enableOnLanguageKeywords) {
       if (onLanguageIDs.length > 0) {
         let langIndex = onLanguageIDs.indexOf(langID);
         if (langIndex != -1) {
-          let textNew = onLanguageKeywords[langIndex]+'+'+selectedText;
+          let textNew = onLanguageKeywords[langIndex] + '+' + selectedText;
           selectedText = textNew;
         }
       };
     };
 
-    // searchForThisInput - Get Default Search Engines 
+    // searchForThisInput - Get Default Search Engines
     let searchIndex = 0;
     let defaultsIndex = 0;
-    let loopIndex = searchEngineDefaults.length-1;
+    let loopIndex = searchEngineDefaults.length - 1;
     while (loopIndex <= searchEngineDefaults.length) {
       while (searchIndex < searchEngineNames.length) {
         if (searchEngineNames[searchIndex] == searchEngineDefaults[defaultsIndex]) {
@@ -316,11 +342,11 @@ async function searchForThisInput() {
         searchIndex++;
       };
       searchIndex = 0;
-      loopIndex ++;
-      defaultsIndex ++;
+      loopIndex++;
+      defaultsIndex++;
     };
 
-    // searchForThisInput - Perform Search Query 
+    // searchForThisInput - Perform Search Query
     let uriText = encodeURI(selectedText);
     let search;
     let query;
@@ -332,15 +358,15 @@ async function searchForThisInput() {
     return;
   };
 
-  // searchForThisInput - Show the Quickpick 
+  // searchForThisInput - Show the Quickpick
   pick = await vscode.window.showQuickPick(pickItems, options);
 
-  // searchForThisInput - User Canceled 
+  // searchForThisInput - User Canceled
   if (!pick || pick.length == 0) {
     return;
   };
 
-  // searchForThisInput - Get Language ID and Apply Associated Keywords to Search Query 
+  // searchForThisInput - Get Language ID and Apply Associated Keywords to Search Query
   if (pick[0].label == 'Enable language ID keywords') {
     let editor = vscode.window.activeTextEditor;
     let langID = editor.document.languageId;
@@ -348,19 +374,19 @@ async function searchForThisInput() {
       if (onLanguageIDs.length > 0) {
         let langIndex = onLanguageIDs.indexOf(langID);
         if (langIndex != -1) {
-          let textNew = onLanguageKeywords[langIndex]+'+'+selectedText;
+          let textNew = onLanguageKeywords[langIndex] + '+' + selectedText;
           selectedText = textNew;
         }
       };
     };
   };
 
-  // searchForThisInput - Get Selected Search Engines 
+  // searchForThisInput - Get Selected Search Engines
   let pickIndex = 0;
   let searchIndex = 0;
-  let loopIndex = searchEngineNames.length-1;
+  let loopIndex = searchEngineNames.length - 1;
   if (pick[0].label == 'Enable language ID keywords') {
-    pickIndex++
+    pickIndex++;
   };
   while (pickIndex < pick.length) {
     while (searchIndex <= loopIndex) {
@@ -370,11 +396,11 @@ async function searchForThisInput() {
       searchIndex++;
     };
     searchIndex = 0;
-    loopIndex = searchEngineNames.length-1;
+    loopIndex = searchEngineNames.length - 1;
     pickIndex++;
   };
 
-  // searchForThisInput - Perform Search Query 
+  // searchForThisInput - Perform Search Query
   let uriText = encodeURI(selectedText);
   let search;
   let query;
@@ -403,7 +429,7 @@ function getSelectedText() {
     let editor = vscode.window.activeTextEditor;
     wordRange = editor.document.getWordRangeAtPosition(editor.selection.start);
     if (wordRange == undefined) {
-      wordRange = editor.document.getWordRangeAtPosition(editor.selection.start,/^.+$/);
+      wordRange = editor.document.getWordRangeAtPosition(editor.selection.start, /^.+$/);
     };
     let wordText = editor.document.getText(wordRange);
     return wordText;
@@ -426,4 +452,4 @@ function getSelectedText() {
 //  │                                                                              │
 //  │                       • Deactivate Extension Cleanup •                       │
 //  ╰──────────────────────────────────────────────────────────────────────────────╯
-function deactivate() {}
+function deactivate() { }
